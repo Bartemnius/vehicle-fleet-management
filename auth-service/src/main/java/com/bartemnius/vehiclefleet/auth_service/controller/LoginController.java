@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api")
 public class LoginController {
 
-    private final User testUser = new User("test", "password");
+  private final User testUser = new User("test", "password");
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        if (testUser.getUsername().equals(loginRequest.getUsername()) &&
-                testUser.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok("Login ok!");
-        } else {
-            return ResponseEntity.status(401).body("Incorrect!");
-        }
+  @PostMapping("/login")
+  public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    if (testUser.getUsername().equals(loginRequest.getUsername())
+        && testUser.getPassword().equals(loginRequest.getPassword())) {
+      return ResponseEntity.ok("Login ok!");
+    } else {
+      return ResponseEntity.status(401).body("Incorrect!");
     }
+  }
 }
