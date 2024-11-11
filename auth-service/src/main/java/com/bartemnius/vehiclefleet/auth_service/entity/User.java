@@ -3,17 +3,23 @@ package com.bartemnius.vehiclefleet.auth_service.entity;
 import com.bartemnius.vehiclefleet.auth_service.utils.Role;
 import com.bartemnius.vehiclefleet.auth_service.utils.TwoFactorMethod;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "app_user") //user is a key word in postgres
+@Table(name = "app_user") // user is a key word in postgres
 public class User {
-  public User(String username, String password, String email, String phoneNumber, Role role, boolean isTwoFactorEnabled, TwoFactorMethod twoFactorMethod) {
+  public User(
+      String username,
+      String password,
+      String email,
+      String phoneNumber,
+      Role role,
+      boolean isTwoFactorEnabled,
+      TwoFactorMethod twoFactorMethod) {
     this.username = username;
     this.password = password;
     this.email = email;
