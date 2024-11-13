@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 // TODO: add some advanced logic:
-//  checking password
-//  checking email and username
-//  checking password complication level 12 signs 1 small 1 big etc.
 //  creating mappings for dtos
 //  create documentation for all endpoints - openapi
 //  delete user
 //  update user
+//  jwt token logic
 
 @Controller
 @RequestMapping("/api")
