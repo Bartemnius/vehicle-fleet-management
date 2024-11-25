@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 //  create documentation for all endpoints - openapi
 //  jwt token logic
 
-
-//TODO 2FA
+// TODO 2FA
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
