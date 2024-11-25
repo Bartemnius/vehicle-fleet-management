@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 // TODO: add some advanced logic:
 //  creating mappings for dtos
 //  create documentation for all endpoints - openapi
-//  delete user
-//  update user
 //  jwt token logic
 
+
+//TODO 2FA
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
