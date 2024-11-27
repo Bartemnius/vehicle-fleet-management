@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 // TODO: add some advanced logic:
-//  creating mappings for dtos
 //  create documentation for all endpoints - openapi
 //  jwt token logic
 

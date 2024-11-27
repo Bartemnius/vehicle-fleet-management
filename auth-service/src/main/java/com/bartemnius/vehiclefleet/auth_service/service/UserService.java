@@ -5,6 +5,7 @@ import com.bartemnius.vehiclefleet.auth_service.dto.UserDto;
 import com.bartemnius.vehiclefleet.auth_service.entity.User;
 import com.bartemnius.vehiclefleet.auth_service.exception.UserDoesNotExistsException;
 import com.bartemnius.vehiclefleet.auth_service.repository.UserRepository;
+import com.bartemnius.vehiclefleet.auth_service.validator.UserValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserService {
   private final UserRepository userRepository;
+  private final UserValidator userValidator;
 
   public UserDto getUser(UUID id) {
     User user =
@@ -46,6 +48,8 @@ public class UserService {
             .findById(id)
             .orElseThrow(
                 () -> new UserDoesNotExistsException("User with given id does not exists"));
+
+    userValidator.validate(updateRequest);
 
     if (updateRequest.getUsername() != null) {
       user.setUsername(updateRequest.getUsername());
