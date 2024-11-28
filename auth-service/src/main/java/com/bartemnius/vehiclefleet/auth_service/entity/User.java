@@ -3,15 +3,21 @@ package com.bartemnius.vehiclefleet.auth_service.entity;
 import com.bartemnius.vehiclefleet.auth_service.utils.Role;
 import com.bartemnius.vehiclefleet.auth_service.utils.TwoFactorMethod;
 import jakarta.persistence.*;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "app_user") // user is a key word in postgres
-public class User {
+public class User implements UserDetails, CredentialsContainer {
   public User(
       String username,
       String password,
@@ -52,4 +58,34 @@ public class User {
 
   @Enumerated(EnumType.STRING)
   private TwoFactorMethod twoFactorMethod;
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
+  }
+
+  @Override
+  public void eraseCredentials() {
+    this.password = null;
+  }
 }

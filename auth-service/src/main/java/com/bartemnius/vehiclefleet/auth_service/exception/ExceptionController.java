@@ -37,4 +37,9 @@ public class ExceptionController {
 
     return ResponseEntity.badRequest().body(errors);
   }
+
+  @ExceptionHandler(UnexpectedErrorException.class)
+  public ResponseEntity<String> handleUnexpectedErrorException(UnexpectedErrorException ex) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+  }
 }

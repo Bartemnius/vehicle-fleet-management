@@ -1,7 +1,12 @@
 package com.bartemnius.vehiclefleet.auth_service.configuration;
 
+import com.bartemnius.vehiclefleet.auth_service.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,17 +19,42 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
     http.authorizeHttpRequests(
-            authorize -> authorize.anyRequest().permitAll() // rest requires authentication
-            )
-        .csrf(AbstractHttpConfigurer::disable); // no csrf
-
+            authorize ->
+                authorize
+                    .requestMatchers("/api/login", "api/register")
+                    .permitAll()
+                    .requestMatchers("/admin/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/user/**")
+                    .hasAnyRole("USER", "ADMIN")
+                    .anyRequest()
+                    .authenticated())
+        .formLogin(form -> form.loginProcessingUrl("/api/login").permitAll())
+        .csrf(AbstractHttpConfigurer::disable)
+        .authenticationProvider(authenticationProvider);
     return http.build();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public AuthenticationProvider authenticationProvider(
+      UserService userService, PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userService); // register my own user service as default one
+    provider.setPasswordEncoder(passwordEncoder); // same with password encoder
+    return provider;
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
   }
 }

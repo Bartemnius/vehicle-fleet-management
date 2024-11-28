@@ -9,12 +9,15 @@ import com.bartemnius.vehiclefleet.auth_service.validator.UserValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
   private final UserRepository userRepository;
   private final UserValidator userValidator;
 
@@ -24,10 +27,10 @@ public class UserService {
             .findById(id)
             .orElseThrow(
                 () -> new UserDoesNotExistsException("User with given id does not exists"));
-    return mapUsertDto(user);
+    return mapUserDto(user);
   }
 
-  private UserDto mapUsertDto(User user) {
+  private UserDto mapUserDto(User user) {
     return new UserDto(
         user.getId(),
         user.getUsername(),
@@ -64,5 +67,16 @@ public class UserService {
     }
 
     userRepository.save(user);
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) {
+    return userRepository
+        .findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Username doe not exists"));
+  }
+
+  public boolean userExists(String username) {
+    return userRepository.findByUsername(username).isPresent();
   }
 }

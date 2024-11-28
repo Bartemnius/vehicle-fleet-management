@@ -1,35 +1,40 @@
 package com.bartemnius.vehiclefleet.auth_service.service;
 
 import com.bartemnius.vehiclefleet.auth_service.dto.LoginRequest;
-import com.bartemnius.vehiclefleet.auth_service.entity.User;
+import com.bartemnius.vehiclefleet.auth_service.exception.UnexpectedErrorException;
 import com.bartemnius.vehiclefleet.auth_service.exception.UserDoesNotExistsException;
 import com.bartemnius.vehiclefleet.auth_service.exception.WrongPasswordException;
-import com.bartemnius.vehiclefleet.auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class LoginService {
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final UserService userService;
 
   public void validateLogin(LoginRequest loginRequest) {
-    User user =
-        userRepository
-            .findByUsername(loginRequest.username())
-            .orElseThrow(
-                () -> new UserDoesNotExistsException("User with this username does not exists!"));
-    checkPassword(loginRequest.password(), user.getPassword());
-    log.info("Login successful!");
-  }
+    if (!userService.userExists(loginRequest.username())) {
+      throw new UserDoesNotExistsException("User does not exist!");
+    }
 
-  private void checkPassword(String rawPassword, String encodedPassword) {
-    if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+    try {
+      authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(
+              loginRequest.username(), loginRequest.password()));
+      log.info("Login successful for username: {}", loginRequest.username());
+    } catch (BadCredentialsException ex) {
+      log.warn("Invalid password for username: {}", loginRequest.username());
       throw new WrongPasswordException("Provided password is not correct!");
+    } catch (Exception ex) {
+      log.error("Unexpected error during login for username: {}", loginRequest.username(), ex);
+      throw new UnexpectedErrorException(
+          "Something went wrong with your login. Please try again later!");
     }
   }
 }
