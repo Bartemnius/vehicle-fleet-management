@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(
     name = "User Controller",
     description =
-        "CRUD operation excluding create are here. Create happens through LoginController")
+        "CRUD operation excluding create are here. Create happens through RegistrationController")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor

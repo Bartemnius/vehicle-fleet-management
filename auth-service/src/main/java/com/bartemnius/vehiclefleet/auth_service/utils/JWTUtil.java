@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class JWTUtil {
 
-  // TODO: later on move it somewhere safe
   private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(System.getenv("JWT_SECRET").getBytes());
   private final long EXPIRATION_TIME_15MIN = 15 * 60 * 1000; // in ms (1000ms/s * 60s/min * 15min) (
 
