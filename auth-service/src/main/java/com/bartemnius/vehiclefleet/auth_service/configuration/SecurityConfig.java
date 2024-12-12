@@ -26,10 +26,11 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
-    http.authorizeHttpRequests(
+    http.csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(
             authorize ->
                 authorize
-                    .requestMatchers("/api/login", "api/register")
+                    .requestMatchers("/api/login", "/api/register")
                     .permitAll()
                     .requestMatchers("/admin/**")
                     .hasRole("ADMIN")
@@ -39,7 +40,6 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .csrf(AbstractHttpConfigurer::disable)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .authenticationProvider(authenticationProvider);
     return http.build();
