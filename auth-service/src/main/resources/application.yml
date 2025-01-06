@@ -2,7 +2,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/vehicle_fleet
+#    TODO : maybe create profile for testing
+#    url: jdbc:postgresql://localhost:5432/vehicle_fleet tests
+    url: jdbc:postgresql://host.docker.internal:5432/vehicle_fleet
     username: postgres
     password: PostgresPassword
     driver-class-name: org.postgresql.Driver

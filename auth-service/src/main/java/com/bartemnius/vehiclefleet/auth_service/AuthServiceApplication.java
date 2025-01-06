@@ -6,10 +6,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-// TODO : For whole microservice
-// TODO : Tests
+// TODO : more tests maybe in future
 // TODO : 2FA
-// TODO : maybe @Schema to swagger docs
 
 @SpringBootApplication
 @OpenAPIDefinition(
