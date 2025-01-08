@@ -1,8 +1,8 @@
 spring:
   application:
-    name: auth-service
+    name: vehicle-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/vehicle_fleet
+    url: jdbc:postgresql://db:5432/vehicle_fleet
     username: postgres
     password: PostgresPassword
     driver-class-name: org.postgresql.Driver
