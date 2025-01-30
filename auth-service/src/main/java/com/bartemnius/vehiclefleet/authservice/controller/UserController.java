@@ -1,5 +1,6 @@
 package com.bartemnius.vehiclefleet.authservice.controller;
 
+import com.bartemnius.vehiclefleet.authservice.dto.Response;
 import com.bartemnius.vehiclefleet.authservice.dto.UpdateUserRequest;
 import com.bartemnius.vehiclefleet.authservice.dto.UserDto;
 import com.bartemnius.vehiclefleet.authservice.service.UserService;
@@ -31,17 +32,18 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "User with given id does not exists")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
+  public ResponseEntity<Response<UserDto>> getUser(@PathVariable UUID id) {
     UserDto user = userService.getUser(id);
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(new Response<>("User retrieved", user));
   }
 
   @Operation(summary = "Delete user", description = "Delete user with given id.")
   @ApiResponses({@ApiResponse(responseCode = "204", description = "User deleted")})
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
+  public ResponseEntity<Response<Void>> deleteUser(@PathVariable UUID id) {
     userService.deleteUser(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted or alredy gone :)");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .body(new Response<>("Deleted or already gone :)", null));
   }
 
   @Operation(
@@ -56,9 +58,9 @@ public class UserController {
             "User with given username/email/phoneNumber already exists and that's why can not be updated.")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<String> updateUser(
+  public ResponseEntity<Response<UserDto>> updateUser(
       @PathVariable UUID id, @RequestBody UpdateUserRequest updateRequest) {
-    userService.updateUser(id, updateRequest);
-    return ResponseEntity.ok("User updated successfully");
+    UserDto updatedUser = userService.updateUser(id, updateRequest);
+    return ResponseEntity.ok(new Response<>("User updated successfully", updatedUser));
   }
 }

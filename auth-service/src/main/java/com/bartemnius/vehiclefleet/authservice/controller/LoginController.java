@@ -1,12 +1,15 @@
 package com.bartemnius.vehiclefleet.authservice.controller;
 
 import com.bartemnius.vehiclefleet.authservice.dto.LoginRequest;
+import com.bartemnius.vehiclefleet.authservice.dto.Response;
 import com.bartemnius.vehiclefleet.authservice.service.LoginService;
 import com.bartemnius.vehiclefleet.authservice.utils.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +42,15 @@ public class LoginController {
         description = "If username or password are not correct will return unauthorized ")
   })
   @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<Response<Map<String, String>>> login(
+      @RequestBody LoginRequest loginRequest) {
     loginService.validateLogin(loginRequest);
     String token = jwtUtil.generateToken(loginRequest.username());
-    return ResponseEntity.status(HttpStatus.OK).body("Bearer:" + token);
+
+    Map<String, String> data = new HashMap<>();
+    data.put("token", "Bearer:" + token);
+    Response<Map<String, String>> response = new Response<>("Login successful!", data);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }

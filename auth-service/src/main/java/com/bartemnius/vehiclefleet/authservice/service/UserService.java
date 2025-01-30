@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
     userRepository.deleteById(id);
   }
 
-  public void updateUser(UUID id, UpdateUserRequest updateRequest) {
+  public UserDto updateUser(UUID id, UpdateUserRequest updateRequest) {
     User user =
         userRepository
             .findById(id)
@@ -66,7 +66,8 @@ public class UserService implements UserDetailsService {
       user.setPhoneNumber(updateRequest.getPhoneNumber());
     }
 
-    userRepository.save(user);
+    User updatedUser = userRepository.save(user);
+    return mapUserDto(updatedUser);
   }
 
   @Override

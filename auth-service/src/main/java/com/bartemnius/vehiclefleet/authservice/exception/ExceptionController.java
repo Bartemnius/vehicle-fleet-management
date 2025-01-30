@@ -1,5 +1,6 @@
 package com.bartemnius.vehiclefleet.authservice.exception;
 
+import com.bartemnius.vehiclefleet.authservice.dto.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -12,34 +13,40 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionController {
 
   @ExceptionHandler(UserAlreadyExistsException.class)
-  public ResponseEntity<String> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+  public ResponseEntity<Response<Void>> handleUserAlreadyExistsException(
+      UserAlreadyExistsException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response<>(ex.getMessage(), null));
   }
 
   @ExceptionHandler(UserDoesNotExistsException.class)
-  public ResponseEntity<String> handleUserDoesNotExistsException(UserDoesNotExistsException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  public ResponseEntity<Response<Void>> handleUserDoesNotExistsException(
+      UserDoesNotExistsException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response<>(ex.getMessage(), null));
   }
 
   @ExceptionHandler(WrongPasswordException.class)
-  public ResponseEntity<String> handleWrongPasswordException(WrongPasswordException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+  public ResponseEntity<Response<Void>> handleWrongPasswordException(WrongPasswordException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new Response<>(ex.getMessage(), null));
   }
 
   // for @Valid annotation
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<List<String>> handleValidationExceptions(
+  public ResponseEntity<Response<List<String>>> handleValidationExceptions(
       MethodArgumentNotValidException ex) {
+
     List<String> errors =
         ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.toList());
 
-    return ResponseEntity.badRequest().body(errors);
+    return ResponseEntity.badRequest().body(new Response<>("Validation failed", errors));
   }
 
   @ExceptionHandler(UnexpectedErrorException.class)
-  public ResponseEntity<String> handleUnexpectedErrorException(UnexpectedErrorException ex) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+  public ResponseEntity<Response<Void>> handleUnexpectedErrorException(
+      UnexpectedErrorException ex) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(new Response<>(ex.getMessage(), null));
   }
 }

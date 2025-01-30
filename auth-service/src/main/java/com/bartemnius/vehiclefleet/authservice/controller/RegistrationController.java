@@ -1,6 +1,7 @@
 package com.bartemnius.vehiclefleet.authservice.controller;
 
 import com.bartemnius.vehiclefleet.authservice.dto.RegistrationRequest;
+import com.bartemnius.vehiclefleet.authservice.dto.Response;
 import com.bartemnius.vehiclefleet.authservice.service.RegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,9 +33,10 @@ public class RegistrationController {
             "User has some fields that are already used by another user, like username, email or password. The message return will defined which of those is already in use. ")
   })
   @PostMapping("/register")
-  public ResponseEntity<String> register(
+  public ResponseEntity<Response<Void>> register(
       @Valid @RequestBody RegistrationRequest registrationRequest) {
     registrationService.registerUser(registrationRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully!");
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new Response<>("User created successfully!", null));
   }
 }
