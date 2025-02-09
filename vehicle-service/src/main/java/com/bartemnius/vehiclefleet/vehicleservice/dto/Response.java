@@ -13,6 +13,6 @@ import lombok.Data;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response<T> {
-    private String message;
-    private T data;
+  private String message;
+  private T data;
 }
