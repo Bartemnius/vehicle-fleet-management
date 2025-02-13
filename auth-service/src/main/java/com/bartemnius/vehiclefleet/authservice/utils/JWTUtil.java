@@ -1,5 +1,6 @@
 package com.bartemnius.vehiclefleet.authservice.utils;
 
+import com.bartemnius.vehiclefleet.authservice.entity.User;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -13,9 +14,10 @@ public class JWTUtil {
   private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(System.getenv("JWT_SECRET").getBytes());
   private final long EXPIRATION_TIME_15MIN = 15 * 60 * 1000; // in ms (1000ms/s * 60s/min * 15min) (
 
-  public String generateToken(String username) {
+  public String generateToken(User userDetails) {
     return Jwts.builder()
-        .subject(username)
+        .subject(userDetails.getUsername())
+        .claim("role", userDetails.getRole())
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_15MIN))
         .signWith(SECRET_KEY)
@@ -48,5 +50,14 @@ public class JWTUtil {
         .getPayload()
         .getExpiration()
         .before(new Date());
+  }
+
+  public String extractRole(String token) {
+    return Jwts.parser()
+        .verifyWith(SECRET_KEY)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("role", String.class);
   }
 }

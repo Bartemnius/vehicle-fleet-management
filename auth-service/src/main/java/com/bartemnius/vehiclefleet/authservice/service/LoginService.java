@@ -1,6 +1,7 @@
 package com.bartemnius.vehiclefleet.authservice.service;
 
 import com.bartemnius.vehiclefleet.authservice.dto.LoginRequest;
+import com.bartemnius.vehiclefleet.authservice.entity.User;
 import com.bartemnius.vehiclefleet.authservice.exception.UnexpectedErrorException;
 import com.bartemnius.vehiclefleet.authservice.exception.UserDoesNotExistsException;
 import com.bartemnius.vehiclefleet.authservice.exception.WrongPasswordException;
@@ -18,7 +19,7 @@ public class LoginService {
   private final AuthenticationManager authenticationManager;
   private final UserService userService;
 
-  public void validateLogin(LoginRequest loginRequest) {
+  public User validateLogin(LoginRequest loginRequest) {
     if (!userService.userExists(loginRequest.username())) {
       throw new UserDoesNotExistsException("User does not exist!");
     }
@@ -36,5 +37,7 @@ public class LoginService {
       throw new UnexpectedErrorException(
           "Something went wrong with your login. Please try again later!");
     }
+
+    return (User) userService.loadUserByUsername(loginRequest.username());
   }
 }

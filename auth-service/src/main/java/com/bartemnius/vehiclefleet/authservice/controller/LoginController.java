@@ -2,6 +2,7 @@ package com.bartemnius.vehiclefleet.authservice.controller;
 
 import com.bartemnius.vehiclefleet.authservice.dto.LoginRequest;
 import com.bartemnius.vehiclefleet.authservice.dto.Response;
+import com.bartemnius.vehiclefleet.authservice.entity.User;
 import com.bartemnius.vehiclefleet.authservice.service.LoginService;
 import com.bartemnius.vehiclefleet.authservice.utils.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,8 +45,8 @@ public class LoginController {
   @PostMapping("/login")
   public ResponseEntity<Response<Map<String, String>>> login(
       @RequestBody LoginRequest loginRequest) {
-    loginService.validateLogin(loginRequest);
-    String token = jwtUtil.generateToken(loginRequest.username());
+    User userDetails = loginService.validateLogin(loginRequest);
+    String token = jwtUtil.generateToken(userDetails);
 
     Map<String, String> data = new HashMap<>();
     data.put("token", "Bearer:" + token);
