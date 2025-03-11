@@ -27,4 +27,7 @@ public class Vehicle {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private VehicleStatus status;
+
+  @Column(nullable = true)
+  private Long userId;
 }
