@@ -12,55 +12,56 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/vehicles")
 @RequiredArgsConstructor
 public class VehicleController {
   private final VehicleService vehicleService;
 
-  //    @GetMapping()
-  //    public ResponseEntity<Response<List<VehicleDto>>> getAllVehicles() {
-  //        List<VehicleDto> vehicles = vehicleService.getAllVehicles();
-  //        Response<List<VehicleDto>> response =
-  //                new Response<>("Retrieved vehicles successfully", vehicles);
-  //        return ResponseEntity.status(HttpStatus.OK).body(response);
-  //    }
+  // ================= ADMIN =================
 
-  @GetMapping("/{vin}")
-  public ResponseEntity<Response<VehicleDto>> getVehicle(@PathVariable String vin) {
-    VehicleDto vehicle = vehicleService.getVehicle(vin);
-    return ResponseEntity.ok().body(new Response<>("Vehicle retrieved successfully", vehicle));
+  @GetMapping("/admin/vehicles")
+  public ResponseEntity<Response<List<VehicleDto>>> getAllVehicles() {
+    List<VehicleDto> vehicles = vehicleService.getAllVehicles();
+    return ResponseEntity.ok(new Response<>("All vehicles retrieved", vehicles));
   }
 
-  @PutMapping("/{vin}")
+  @GetMapping("/admin/vehicles/{vin}")
+  public ResponseEntity<Response<VehicleDto>> getVehicle(@PathVariable String vin) {
+    VehicleDto vehicle = vehicleService.getVehicle(vin);
+    return ResponseEntity.ok(new Response<>("Vehicle retrieved successfully", vehicle));
+  }
+
+  @PutMapping("/admin/vehicles/{vin}")
   public ResponseEntity<Response<VehicleDto>> updateVehicle(
       @PathVariable String vin, @RequestBody VehicleDto vehicleDto) {
     VehicleDto updatedVehicle = vehicleService.updateVehicle(vin, vehicleDto);
-    return ResponseEntity.ok().body(new Response<>("Vehicle updated successfully", updatedVehicle));
+    return ResponseEntity.ok(new Response<>("Vehicle updated successfully", updatedVehicle));
   }
 
-  @DeleteMapping("/{vin}")
+  @DeleteMapping("/admin/vehicles/{vin}")
   public ResponseEntity<Response<String>> deleteVehicle(@PathVariable String vin) {
     vehicleService.deleteVehicle(vin);
     return ResponseEntity.status(HttpStatus.NO_CONTENT)
         .body(new Response<>("Vehicle deleted successfully", vin));
   }
 
-  @GetMapping("/status/{status}")
+  @GetMapping("/admin/vehicles/status/{status}")
   public ResponseEntity<Response<List<VehicleDto>>> getVehiclesByStatus(
       @PathVariable VehicleStatus status) {
     List<VehicleDto> vehicles = vehicleService.getVehiclesByStatus(status);
-    return ResponseEntity.ok().body(new Response<>("Vehicles retrieved successfully", vehicles));
+    return ResponseEntity.ok(new Response<>("Vehicles retrieved successfully", vehicles));
   }
 
-  @GetMapping
+  // ================= USER =================
+
+  @GetMapping("/user/vehicles")
   public ResponseEntity<Response<List<VehicleDto>>> getUserVehicles(
       @AuthenticationPrincipal String username) {
     Long userId = getUserIdFromAuthService(username);
     List<VehicleDto> vehicles = vehicleService.getUserVehicles(userId);
-    return ResponseEntity.ok(new Response<>("Vehicles retrieved", vehicles));
+    return ResponseEntity.ok(new Response<>("User's vehicles retrieved", vehicles));
   }
 
-  @GetMapping("/available")
+  @GetMapping("/user/vehicles/available")
   public ResponseEntity<Response<List<VehicleDto>>> getAvailableVehicles() {
     List<VehicleDto> vehicles = vehicleService.getAvailableVehicles();
     return ResponseEntity.ok(new Response<>("Available vehicles retrieved", vehicles));
