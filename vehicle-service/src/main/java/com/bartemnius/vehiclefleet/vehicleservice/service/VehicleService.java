@@ -6,44 +6,36 @@ import com.bartemnius.vehiclefleet.vehicleservice.exception.VehicleNotFoundExcep
 import com.bartemnius.vehiclefleet.vehicleservice.repository.VehicleRepository;
 import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-// @RequiredArgsConstructor
+@RequiredArgsConstructor
 public class VehicleService {
   private final VehicleRepository vehicleRepository;
 
-  public VehicleService(VehicleRepository vehicleRepository) {
-    this.vehicleRepository = vehicleRepository;
-  }
-
   public List<VehicleDto> getAllVehicles() {
-    List<Vehicle> all = vehicleRepository.findAll();
-    return mapToDtos(all);
-  }
-
-  private List<VehicleDto> mapToDtos(List<Vehicle> vehicles) {
-    return vehicles.stream()
-        .map(
-            vehicle ->
-                new VehicleDto(
-                    vehicle.getId(),
-                    vehicle.getVin(),
-                    vehicle.getBrand(),
-                    vehicle.getModel(),
-                    vehicle.getYear(),
-                    vehicle.getStatus()))
-        .toList();
+    return mapToDtos(vehicleRepository.findAll());
   }
 
   public VehicleDto getVehicle(String vin) {
-    Vehicle vehicle =
-        vehicleRepository
-            .findByVin(vin)
-            .orElseThrow(
-                () ->
-                    new VehicleNotFoundException("Vehicle with given vin number does not exists!"));
-    return mapToDtos(List.of(vehicle)).get(0);
+    return vehicleRepository
+        .findByVin(vin)
+        .map(this::mapToDto)
+        .orElseThrow(() -> new VehicleNotFoundException("Vehicle with given VIN does not exist!"));
+  }
+
+  public VehicleDto addVehicle(VehicleDto vehicleDto) {
+    Vehicle vehicle = new Vehicle();
+    vehicle.setVin(vehicleDto.vin());
+    vehicle.setBrand(vehicleDto.brand());
+    vehicle.setModel(vehicleDto.model());
+    vehicle.setYear(vehicleDto.year());
+    vehicle.setStatus(vehicleDto.status());
+    vehicle.setUserId(vehicleDto.userId());
+
+    Vehicle savedVehicle = vehicleRepository.save(vehicle);
+    return mapToDto(savedVehicle);
   }
 
   public VehicleDto updateVehicle(String vin, VehicleDto vehicleDto) {
@@ -51,16 +43,15 @@ public class VehicleService {
         vehicleRepository
             .findByVin(vin)
             .orElseThrow(
-                () ->
-                    new VehicleNotFoundException("Vehicle with given vin number does not exists!"));
+                () -> new VehicleNotFoundException("Vehicle with given VIN does not exist!"));
 
     vehicle.setBrand(vehicleDto.brand());
     vehicle.setModel(vehicleDto.model());
     vehicle.setYear(vehicleDto.year());
     vehicle.setStatus(vehicleDto.status());
 
-    vehicleRepository.save(vehicle);
-    return mapToDtos(List.of(vehicle)).get(0);
+    Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+    return mapToDto(updatedVehicle);
   }
 
   public void deleteVehicle(String vin) {
@@ -68,23 +59,50 @@ public class VehicleService {
         vehicleRepository
             .findByVin(vin)
             .orElseThrow(
-                () ->
-                    new VehicleNotFoundException("Vehicle with given vin number does not exists!"));
+                () -> new VehicleNotFoundException("Vehicle with given VIN does not exist!"));
     vehicleRepository.delete(vehicle);
   }
 
   public List<VehicleDto> getVehiclesByStatus(VehicleStatus status) {
-    List<Vehicle> vehicles = vehicleRepository.findByStatus(status);
-    return mapToDtos(vehicles);
+    return mapToDtos(vehicleRepository.findByStatus(status));
   }
 
   public List<VehicleDto> getUserVehicles(Long userId) {
-    List<Vehicle> vehicles = vehicleRepository.findByUserId(userId);
-    return mapToDtos(vehicles);
+    return mapToDtos(vehicleRepository.findByUserId(userId));
   }
 
   public List<VehicleDto> getAvailableVehicles() {
-    List<Vehicle> vehicles = vehicleRepository.findByUserIdIsNull();
-    return mapToDtos(vehicles);
+    return mapToDtos(vehicleRepository.findByUserIdIsNull());
+  }
+
+  public VehicleDto assignVehicleToUser(String vin, Long userId) {
+    Vehicle vehicle =
+        vehicleRepository
+            .findByVin(vin)
+            .orElseThrow(
+                () -> new VehicleNotFoundException("Vehicle with given VIN does not exist!"));
+
+    if (vehicle.getUserId() != null) {
+      throw new IllegalStateException("Vehicle is already assigned to a user.");
+    }
+
+    vehicle.setUserId(userId);
+    Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+    return mapToDto(updatedVehicle);
+  }
+
+  private VehicleDto mapToDto(Vehicle vehicle) {
+    return new VehicleDto(
+        vehicle.getId(),
+        vehicle.getVin(),
+        vehicle.getBrand(),
+        vehicle.getModel(),
+        vehicle.getYear(),
+        vehicle.getStatus(),
+        vehicle.getUserId());
+  }
+
+  private List<VehicleDto> mapToDtos(List<Vehicle> vehicles) {
+    return vehicles.stream().map(this::mapToDto).toList();
   }
 }

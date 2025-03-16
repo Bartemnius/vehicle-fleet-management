@@ -24,6 +24,13 @@ public class VehicleController {
     return ResponseEntity.ok(new Response<>("All vehicles retrieved", vehicles));
   }
 
+  @PostMapping("/admin/vehicles")
+  public ResponseEntity<Response<VehicleDto>> addVehicle(@RequestBody VehicleDto vehicleDto) {
+    VehicleDto createdVehicle = vehicleService.addVehicle(vehicleDto);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new Response<>("Vehicle created successfully", createdVehicle));
+  }
+
   @GetMapping("/admin/vehicles/{vin}")
   public ResponseEntity<Response<VehicleDto>> getVehicle(@PathVariable String vin) {
     VehicleDto vehicle = vehicleService.getVehicle(vin);
@@ -65,6 +72,14 @@ public class VehicleController {
   public ResponseEntity<Response<List<VehicleDto>>> getAvailableVehicles() {
     List<VehicleDto> vehicles = vehicleService.getAvailableVehicles();
     return ResponseEntity.ok(new Response<>("Available vehicles retrieved", vehicles));
+  }
+
+  @PutMapping("/user/vehicles/{vin}/assign")
+  public ResponseEntity<Response<VehicleDto>> assignVehicleToUser(
+      @AuthenticationPrincipal String username, @PathVariable String vin) {
+    Long userId = getUserIdFromAuthService(username);
+    VehicleDto assignedVehicle = vehicleService.assignVehicleToUser(vin, userId);
+    return ResponseEntity.ok(new Response<>("Vehicle assigned successfully", assignedVehicle));
   }
 
   private Long getUserIdFromAuthService(String username) {

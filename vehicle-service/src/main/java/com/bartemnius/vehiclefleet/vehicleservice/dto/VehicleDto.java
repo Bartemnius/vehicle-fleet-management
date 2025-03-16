@@ -10,7 +10,7 @@ public record VehicleDto(
     @NotBlank(message = "VIN cannot be blank") String vin,
     @NotBlank(message = "Brand cannot be blank") String brand,
     @NotBlank(message = "Model cannot be blank") String model,
-    @NotNull(message = "Year cannot be null")
-        @Min(value = 1886, message = "Year must be valid") // Pierwszy samochód powstał w 1886 roku
+    @NotNull(message = "Year cannot be null") @Min(value = 1886, message = "Year must be valid")
         Integer year,
-    @NotNull(message = "Status cannot be null") VehicleStatus status) {}
+    @NotNull(message = "Status cannot be null") VehicleStatus status,
+    Long userId) {}
