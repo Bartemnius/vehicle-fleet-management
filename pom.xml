@@ -13,6 +13,7 @@
     <modules>
         <module>auth-service</module>
         <module>vehicle-service</module>
+        <module>report-service</module>
     </modules>
 
     <properties>
