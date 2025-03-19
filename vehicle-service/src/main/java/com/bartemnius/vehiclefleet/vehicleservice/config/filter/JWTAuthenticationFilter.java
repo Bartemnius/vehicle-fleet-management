@@ -17,6 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
+/**
+ * This filter intercepts all incoming HTTP requests to check if they contain a valid JWT token. -
+ * If the request has an "Authorization: Bearer <token>" header, the token is validated. - The
+ * filter calls the Auth Service to verify the token. - If the token is valid, the user details
+ * (username and role) are extracted. - The user is authenticated and stored in the SecurityContext.
+ * - If the token is invalid, the request is rejected with HTTP 401 (Unauthorized).
+ */
 @Component
 @RequiredArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
@@ -54,7 +61,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       List<GrantedAuthority> authorities = Collections.singletonList(() -> "ROLE_" + role);
 
       UsernamePasswordAuthenticationToken authentication =
-          new UsernamePasswordAuthenticationToken(username, null, authorities);
+          new UsernamePasswordAuthenticationToken(username, token, authorities);
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
     } catch (Exception e) {

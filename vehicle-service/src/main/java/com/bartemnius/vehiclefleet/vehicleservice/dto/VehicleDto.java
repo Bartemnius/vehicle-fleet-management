@@ -4,6 +4,7 @@ import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 
 public record VehicleDto(
     Long id,
@@ -13,4 +14,4 @@ public record VehicleDto(
     @NotNull(message = "Year cannot be null") @Min(value = 1886, message = "Year must be valid")
         Integer year,
     @NotNull(message = "Status cannot be null") VehicleStatus status,
-    Long userId) {}
+    UUID userId) {}

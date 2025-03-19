@@ -5,6 +5,7 @@ import com.bartemnius.vehiclefleet.vehicleservice.dto.VehicleDto;
 import com.bartemnius.vehiclefleet.vehicleservice.service.VehicleService;
 import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class VehicleController {
   @GetMapping("/user/vehicles")
   public ResponseEntity<Response<List<VehicleDto>>> getUserVehicles(
       @AuthenticationPrincipal String username) {
-    Long userId = getUserIdFromAuthService(username);
+    UUID userId = vehicleService.getUserIdFromAuthService(username);
     List<VehicleDto> vehicles = vehicleService.getUserVehicles(userId);
     return ResponseEntity.ok(new Response<>("User's vehicles retrieved", vehicles));
   }
@@ -77,12 +78,8 @@ public class VehicleController {
   @PutMapping("/user/vehicles/{vin}/assign")
   public ResponseEntity<Response<VehicleDto>> assignVehicleToUser(
       @AuthenticationPrincipal String username, @PathVariable String vin) {
-    Long userId = getUserIdFromAuthService(username);
+    UUID userId = vehicleService.getUserIdFromAuthService(username);
     VehicleDto assignedVehicle = vehicleService.assignVehicleToUser(vin, userId);
     return ResponseEntity.ok(new Response<>("Vehicle assigned successfully", assignedVehicle));
-  }
-
-  private Long getUserIdFromAuthService(String username) {
-    return 1L;
   }
 }

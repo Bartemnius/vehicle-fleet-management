@@ -6,13 +6,23 @@ import com.bartemnius.vehiclefleet.vehicleservice.exception.VehicleNotFoundExcep
 import com.bartemnius.vehiclefleet.vehicleservice.repository.VehicleRepository;
 import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VehicleService {
   private final VehicleRepository vehicleRepository;
+  private final WebClient webClient;
 
   public List<VehicleDto> getAllVehicles() {
     return mapToDtos(vehicleRepository.findAll());
@@ -67,7 +77,7 @@ public class VehicleService {
     return mapToDtos(vehicleRepository.findByStatus(status));
   }
 
-  public List<VehicleDto> getUserVehicles(Long userId) {
+  public List<VehicleDto> getUserVehicles(UUID userId) {
     return mapToDtos(vehicleRepository.findByUserId(userId));
   }
 
@@ -75,7 +85,7 @@ public class VehicleService {
     return mapToDtos(vehicleRepository.findByUserIdIsNull());
   }
 
-  public VehicleDto assignVehicleToUser(String vin, Long userId) {
+  public VehicleDto assignVehicleToUser(String vin, UUID userId) {
     Vehicle vehicle =
         vehicleRepository
             .findByVin(vin)
@@ -104,5 +114,52 @@ public class VehicleService {
 
   private List<VehicleDto> mapToDtos(List<Vehicle> vehicles) {
     return vehicles.stream().map(this::mapToDto).toList();
+  }
+
+  public UUID getUserIdFromAuthService(String username) {
+    try {
+      String token = getCurrentToken();
+      if (token == null) {
+        throw new ResponseStatusException(
+            HttpStatus.UNAUTHORIZED, "Missing token in SecurityContext");
+      }
+
+      log.info("Requesting user ID for username: {} with token: {}", username, token);
+      Map<String, Object> response =
+          webClient
+              .get()
+              .uri(
+                  uriBuilder ->
+                      uriBuilder.path("/auth/user-id").queryParam("username", username).build())
+              .header("Authorization", "Bearer " + token)
+              .retrieve()
+              .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+              .block();
+
+      log.info("Response: {}", response);
+
+      if (response == null || !response.containsKey("userId")) {
+        throw new ResponseStatusException(
+            HttpStatus.UNAUTHORIZED, "User ID not found for: " + username);
+      }
+
+      return UUID.fromString((String) response.get("userId")); // 🔥 Konwersja String -> UUID
+
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to fetch user ID", e);
+    }
+  }
+
+  private String getCurrentToken() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    log.info(authentication.toString());
+    log.info("Principal: {}", authentication.getPrincipal());
+    log.info("Authorities: {}", authentication.getAuthorities());
+    log.info("Credentials: {}", authentication.getCredentials());
+    if (authentication != null && authentication.getCredentials() instanceof String token) {
+      return token;
+    }
+    return null;
   }
 }

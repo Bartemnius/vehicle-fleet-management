@@ -2,6 +2,7 @@ package com.bartemnius.vehiclefleet.vehicleservice.entity;
 
 import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.Data;
 
 @Entity
@@ -29,5 +30,5 @@ public class Vehicle {
   private VehicleStatus status;
 
   @Column(nullable = true)
-  private Long userId;
+  private UUID userId;
 }
