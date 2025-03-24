@@ -8,3 +8,10 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/vehicle_reports
       database: vehicle_reports
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: report-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
