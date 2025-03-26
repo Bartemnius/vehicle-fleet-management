@@ -1,11 +1,11 @@
 server:
-  port:8080
+  port: 8080
 
 spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/vehicle_fleet
+    url: jdbc:postgresql://db:5432/vehicle_fleet
     username: postgres
     password: PostgresPassword
     driver-class-name: org.postgresql.Driver

@@ -1,5 +1,5 @@
 server:
-  port:8090
+  port: 8090
 
 spring:
   application:
@@ -16,6 +16,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 auth-service:
-  base-url: http://auth-service
+  base-url: http://auth-service:8080
