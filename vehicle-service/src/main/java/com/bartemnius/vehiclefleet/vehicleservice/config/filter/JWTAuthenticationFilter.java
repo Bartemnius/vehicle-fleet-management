@@ -1,5 +1,6 @@
 package com.bartemnius.vehiclefleet.vehicleservice.config.filter;
 
+import com.bartemnius.vehiclefleet.vehicleservice.config.AuthServiceProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -10,6 +11,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +27,13 @@ import org.springframework.web.reactive.function.client.WebClient;
  * (username and role) are extracted. - The user is authenticated and stored in the SecurityContext.
  * - If the token is invalid, the request is rejected with HTTP 401 (Unauthorized).
  */
-@Component
 @RequiredArgsConstructor
+@Slf4j
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
   private final WebClient webClient;
   private final ObjectMapper objectMapper;
+  private final AuthServiceProperties properties;
 
   @Override
   protected void doFilterInternal(
@@ -43,10 +47,21 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     }
 
     String token = authHeader.substring(7);
-    String url = "http://localhost:8080/auth/validate?token=" + token;
 
     try {
-      String jsonResponse = webClient.get().uri(url).retrieve().bodyToMono(String.class).block();
+      String jsonResponse = webClient
+              .get()
+              .uri(uriBuilder -> uriBuilder
+                      .scheme("http")
+                      .host(properties.getHost())
+                      .port(properties.getPort())
+                      .path("/auth/validate")
+                      .queryParam("token", token)
+                      .build()
+              )
+              .retrieve()
+              .bodyToMono(String.class)
+              .block();
 
       JsonNode jsonNode = objectMapper.readTree(jsonResponse);
 
