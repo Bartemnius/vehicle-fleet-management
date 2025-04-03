@@ -1,12 +1,12 @@
 package com.bartemnius.vehiclefleet.vehicleservice;
 
+import com.bartemnius.vehiclefleet.vehicleservice.config.AuthServiceProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@SpringBootApplication(
-    exclude = {
-      org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class
-    })
+@SpringBootApplication
+@EnableConfigurationProperties(AuthServiceProperties.class)
 public class VehicleServiceApplication {
 
   public static void main(String[] args) {

@@ -1,10 +1,13 @@
 package com.bartemnius.vehiclefleet.vehicleservice.service;
 
+import com.bartemnius.vehiclefleet.vehicleservice.dto.ReportEventDto;
 import com.bartemnius.vehiclefleet.vehicleservice.dto.VehicleDto;
 import com.bartemnius.vehiclefleet.vehicleservice.entity.Vehicle;
 import com.bartemnius.vehiclefleet.vehicleservice.exception.VehicleNotFoundException;
 import com.bartemnius.vehiclefleet.vehicleservice.repository.VehicleRepository;
 import com.bartemnius.vehiclefleet.vehicleservice.utils.VehicleStatus;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class VehicleService {
   private final VehicleRepository vehicleRepository;
   private final WebClient webClient;
+  private final VehicleEventPublisher vehicleEventPublisher;
 
   public List<VehicleDto> getAllVehicles() {
     return mapToDtos(vehicleRepository.findAll());
@@ -98,6 +102,13 @@ public class VehicleService {
 
     vehicle.setUserId(userId);
     Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+    vehicleEventPublisher.sendVehicleEvent(new ReportEventDto(
+            updatedVehicle.getVin(),
+            userId.toString(),
+            "ASSIGNED",
+            LocalDateTime.now()));
+
     return mapToDto(updatedVehicle);
   }
 
@@ -118,13 +129,13 @@ public class VehicleService {
 
   public UUID getUserIdFromAuthService(String username) {
     try {
+      log.info("I into getUserIdFromAuthService 2");
       String token = getCurrentToken();
       if (token == null) {
         throw new ResponseStatusException(
             HttpStatus.UNAUTHORIZED, "Missing token in SecurityContext");
       }
 
-      log.info("Requesting user ID for username: {} with token: {}", username, token);
       Map<String, Object> response =
           webClient
               .get()
@@ -136,14 +147,12 @@ public class VehicleService {
               .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
               .block();
 
-      log.info("Response: {}", response);
-
       if (response == null || !response.containsKey("userId")) {
         throw new ResponseStatusException(
             HttpStatus.UNAUTHORIZED, "User ID not found for: " + username);
       }
 
-      return UUID.fromString((String) response.get("userId")); // 🔥 Konwersja String -> UUID
+      return UUID.fromString((String) response.get("userId"));
 
     } catch (Exception e) {
       throw new ResponseStatusException(
@@ -153,10 +162,6 @@ public class VehicleService {
 
   private String getCurrentToken() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
-    log.info(authentication.toString());
-    log.info("Principal: {}", authentication.getPrincipal());
-    log.info("Authorities: {}", authentication.getAuthorities());
-    log.info("Credentials: {}", authentication.getCredentials());
     if (authentication != null && authentication.getCredentials() instanceof String token) {
       return token;
     }
