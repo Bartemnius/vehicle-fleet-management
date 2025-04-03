@@ -1,18 +1,18 @@
 package com.bartemnius.vehiclefleet.vehicleservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebClientConfig {
 
-  @Value("${auth-service.base-url}")
-  private String authServiceBaseUrl;
+  private final AuthServiceProperties properties;
 
   @Bean
   public WebClient webClient() {
-    return WebClient.builder().baseUrl(authServiceBaseUrl).build();
+    return WebClient.builder().baseUrl(properties.getBaseUrl()).build();
   }
 }
