@@ -24,3 +24,5 @@ spring:
 
 auth-service:
   base-url: http://auth-service:8080
+  host: auth-service
+  port: 8080
