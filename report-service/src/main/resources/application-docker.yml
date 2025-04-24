@@ -14,3 +14,8 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+auth-service:
+  base-url: http://auth-service:8080
+  host: auth-service
+  port: 8080
