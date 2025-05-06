@@ -11,7 +11,7 @@
 	<groupId>com.bartemnius.vehiclefleet</groupId>
 	<artifactId>report-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Report service</name>
+	<name>report-service</name>
 	<description>Microservice for vehicle reports and logging</description>
 	<url/>
 	<licenses>

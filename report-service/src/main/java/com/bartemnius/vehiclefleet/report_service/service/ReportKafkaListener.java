@@ -16,7 +16,7 @@ import java.util.Map;
 public class ReportKafkaListener {
     private final ReportRepository reportRepository;
 
-    @KafkaListener(topics = "vehicle-events", groupId = "report-group")
+    @KafkaListener(topics = "vehicle-events", groupId = "${spring.kafka.consumer.group-id}")
     public void handleVehicleEvent(Map<String, Object> event) {
         log.info("Received event: {}", event);
 
