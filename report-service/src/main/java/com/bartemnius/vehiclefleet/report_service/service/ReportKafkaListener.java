@@ -1,5 +1,6 @@
 package com.bartemnius.vehiclefleet.report_service.service;
 
+import com.bartemnius.vehiclefleet.report_service.dto.ReportEventDto;
 import com.bartemnius.vehiclefleet.report_service.model.Report;
 import com.bartemnius.vehiclefleet.report_service.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,14 @@ public class ReportKafkaListener {
     private final ReportRepository reportRepository;
 
     @KafkaListener(topics = "vehicle-events", groupId = "${spring.kafka.consumer.group-id}")
-    public void handleVehicleEvent(Map<String, Object> event) {
+    public void handleVehicleEvent(ReportEventDto event) {
         log.info("Received event: {}", event);
 
         Report report = new Report();
-        report.setVin((String) event.get("vin"));
-        report.setUserId((String) event.get("userId"));
-        report.setAction((String) event.get("action"));
-        report.setTimestamp(LocalDateTime.parse((String) event.get("timestamp")));
+        report.setVin(event.getVin());
+        report.setUserId(event.getUserId());
+        report.setAction(event.getAction());
+        report.setTimestamp(event.getTimestamp());
 
         reportRepository.save(report);
     }

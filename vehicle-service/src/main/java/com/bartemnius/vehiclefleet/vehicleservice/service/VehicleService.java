@@ -103,6 +103,7 @@ public class VehicleService {
     vehicle.setUserId(userId);
     Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
+    log.info("Sending event");
     vehicleEventPublisher.sendVehicleEvent(new ReportEventDto(
             updatedVehicle.getVin(),
             userId.toString(),
