@@ -21,6 +21,7 @@ public class LoginService {
 
   public User validateLogin(LoginRequest loginRequest) {
     if (!userService.userExists(loginRequest.username())) {
+      log.warn("Login attempt with non-existing username: {}", loginRequest.username());
       throw new UserDoesNotExistsException("User does not exist!");
     }
 

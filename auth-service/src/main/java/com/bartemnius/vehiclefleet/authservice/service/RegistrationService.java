@@ -20,6 +20,7 @@ public class RegistrationService {
   private final UserValidator userValidator;
 
   public void registerUser(RegistrationRequest registrationRequest) {
+    log.info("Registering user with username: {}", registrationRequest.getUsername());
     userValidator.validate(registrationRequest);
 
     String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());

@@ -22,6 +22,7 @@ public class UserService implements UserDetailsService {
   private final UserValidator userValidator;
 
   public UserDto getUser(UUID id) {
+    log.info("Fetching user with id: {}", id);
     User user =
         userRepository
             .findById(id)
@@ -42,10 +43,13 @@ public class UserService implements UserDetailsService {
   }
 
   public void deleteUser(UUID id) {
+    log.info("Attempting to delete user with ID: {}", id);
     userRepository.deleteById(id);
+    log.info("User with ID: {} deleted successfully", id);
   }
 
   public UserDto updateUser(UUID id, UpdateUserRequest updateRequest) {
+    log.info("Updating user with ID: {}", id);
     User user =
         userRepository
             .findById(id)
@@ -67,6 +71,7 @@ public class UserService implements UserDetailsService {
     }
 
     User updatedUser = userRepository.save(user);
+    log.info("User with ID: {} updated successfully", id);
     return mapUserDto(updatedUser);
   }
 
